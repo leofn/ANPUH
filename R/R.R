@@ -1,4 +1,3 @@
-#setwd("I:\\Dropbox\\R_experimentos\\ANPUH")
 library(dplyr)
 library(tidyverse)
 library(lubridate)
@@ -9,15 +8,10 @@ library(quanteda)
 library(rlist)
 library(anytime)
 require(tidytext)
-# Lendo o arquivo incialmente
-#df <- read.csv("I:\\Dropbox\\R_experimentos\\ANPUH\\csv\\anais-anpuh-resumos.csv", encoding = "UTF-8")
-#saveRDS(df, "data\\df.rds")
-
-### COMEÇAR A PARTIR DAQUI
 
 # Restaure o objeto df com a base de dados
 
-df <- readRDS(file = "data\\df.rds")
+df <- readRDS(file = "data/df.rds") # para windows "data\\df.rds"
 
 #Limpando o campo resumo
 df$Resumo <- gsub("Resumo:", "", df$Resumo)
@@ -29,15 +23,25 @@ df$data <- as.Date(as.character(df$Ano), format = "%Y")
 
 escravidao <- df %>% 
   # Filtrando linhas que contém o termo
-  filter(str_detect(Resumo, "escravidão"))
+  filter(str_detect(Resumo, "escravidão|escravos|escravas|escravizados|escravizadas|cativeiro|cativos|cativas"))
 
 africa <- df %>% 
   # Filtrando linhas que contém o termo
   filter(str_detect(Resumo, "África|africanos|africanas"))
 
+digital <- df %>% 
+  # Filtrando linhas que contém o termo
+  filter(str_detect(Resumo, "digital|digitais|tecnologia|informática"))
 
+ditadura <- df %>% 
+  # Filtrando linhas que contém o termo
+  filter(str_detect(Resumo, "ditadura"))
 
-africa %>% 
+hist_publ <- df %>% 
+  # Filtrando linhas que contém o termo
+  filter(str_detect(Resumo, "história pública|História Pública"))
+
+hist_publ %>% 
   mutate(date = lubridate::round_date(data, "year")) %>% 
   mutate(date = as.Date(data)) %>% 
   group_by(date) %>% 
@@ -47,7 +51,7 @@ africa %>%
   geom_point() +
   xlab("") +
   ylab("Número de mensagens")+
-  ggtitle("Menções à África dos resumos da ANPUH (2013-2019)") +
+  ggtitle("Menções à História Pública dos resumos da ANPUH (2013-2019)") +
   theme_gray(12)+ 
   ## Centralizando o título, tem que ser aqui
   theme(plot.title = element_text(hjust = 0.5))
